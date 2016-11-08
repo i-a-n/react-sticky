@@ -1,4 +1,4 @@
-react-sticky-alt [![Build Status](https://travis-ci.org/i-a-n/react-sticky-alt.svg?branch=master)](https://travis-ci.org/i-a-n/react-sticky-alt)
+# react-sticky-alt
 
 ## Fork Notice
 This is a fork of the original `react-sticky` repo, here: https://github.com/captivationsoftware/react-sticky
