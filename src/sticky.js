@@ -3,206 +3,240 @@ import ReactDOM from 'react-dom';
 
 export default class Sticky extends React.Component {
 
-  static propTypes = {
-    isActive: React.PropTypes.bool,
-    className: React.PropTypes.string,
-    style: React.PropTypes.object,
-    stickyClassName: React.PropTypes.string,
-    stickyStyle: React.PropTypes.object,
-    topOffset: React.PropTypes.number,
-    bottomOffset: React.PropTypes.number,
-    onStickyStateChange: React.PropTypes.func
-  }
+	static propTypes = {
+		isActive: React.PropTypes.bool,
+		className: React.PropTypes.string,
+		container: React.PropTypes.any,
+		children: React.PropTypes.any,
+		style: React.PropTypes.object,
+		stickyClassName: React.PropTypes.string,
+		stickyStyle: React.PropTypes.object,
+		topOffset: React.PropTypes.number,
+		bottomOffset: React.PropTypes.number,
+		onStickyStateChange: React.PropTypes.func
+	}
 
-  static defaultProps = {
-    isActive: true,
-    className: '',
-    style: {},
-    stickyClassName: 'sticky',
-    stickyStyle: {},
-    topOffset: 0,
-    bottomOffset: 0,
-    onStickyStateChange: () => {}
-  }
+	static defaultProps = {
+		isActive: true,
+		className: '',
+		container: '',
+		style: {},
+		stickyClassName: 'sticky',
+		stickyStyle: {},
+		topOffset: 0,
+		bottomOffset: 0,
+		onStickyStateChange: () => {}
+	}
 
-  static contextTypes = {
-    'sticky-channel': React.PropTypes.any
-  }
+	static contextTypes = {
+		'sticky-channel': React.PropTypes.any
+	}
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+	constructor(props) {
+		super(props);
+		this.state = {};
+	}
 
-  componentWillMount() {
-    this.channel = this.context['sticky-channel'];
-    this.channel.subscribe(this.updateContext);
-  }
+	componentWillMount() {
+		this.channel = this.context['sticky-channel'];
+		this.channel.subscribe(this.updateContext);
+	}
 
-  componentDidMount() {
-    this.on(['resize', 'scroll', 'touchstart', 'touchmove', 'touchend', 'pageshow', 'load'], this.recomputeState);
-    this.recomputeState();
-  }
+	componentDidMount() {
+		this.on(['resize', 'scroll', 'touchstart', 'touchmove', 'touchend', 'pageshow', 'load'], this.recomputeState);
+		this.recomputeState();
+	}
 
-  componentWillReceiveProps() {
-    this.recomputeState();
-  }
+	componentWillReceiveProps() {
+		this.recomputeState();
+	}
 
-  componentWillUnmount() {
-    this.off(['resize', 'scroll', 'touchstart', 'touchmove', 'touchend', 'pageshow', 'load'], this.recomputeState);
-    this.channel.unsubscribe(this.updateContext);
-  }
+	shouldComponentUpdate(newProps, newState) {
+		// Have we changed the number of props?
+		const propNames = Object.keys(this.props);
+		if (Object.keys(newProps).length !== propNames.length) return true;
 
-  getXOffset() {
-    return this.refs.placeholder.getBoundingClientRect().left;
-  }
+		// Have we changed any prop values?
+		const valuesMatch = propNames.every((key) => { // eslint-disable-line
+			return newProps.hasOwnProperty(key) && newProps[key] === this.props[key];
+		});
+		if (!valuesMatch) return true;
 
-  getWidth() {
-    return this.refs.placeholder.getBoundingClientRect().width;
-  }
+		// Have we changed any state that will always impact rendering?
+		const state = this.state;
+		if (newState.isSticky !== state.isSticky) return true;
 
-  getHeight() {
-    return ReactDOM.findDOMNode(this.refs.children).getBoundingClientRect().height;
-  }
+		// If we are sticky, have we changed any state that will impact rendering?
+		if (state.isSticky) {
+			if (newState.height !== state.height) return true;
+			if (newState.width !== state.width) return true;
+			if (newState.xOffset !== state.xOffset) return true;
+			if (newState.containerOffset !== state.containerOffset) return true;
+			if (newState.distanceFromBottom !== state.distanceFromBottom) return true;
+		}
 
-  getDistanceFromTop() {
-    return this.refs.placeholder.getBoundingClientRect().top;
-  }
+		return false;
+	}
 
-  getDistanceFromBottom() {
-    if (!this.containerNode) return 0;
-    return this.containerNode.getBoundingClientRect().bottom;
-  }
+	componentDidUpdate(prevProps) {
+		const scrollTargetElement = this.props.container;
 
-  isSticky() {
-    if (!this.props.isActive) return false;
+		// Set the product line based on URL params
+		if (
+			prevProps.container !== scrollTargetElement ||
+			scrollTargetElement === null
+		) {
+			this.on(['resize', 'scroll', 'touchstart', 'touchmove', 'touchend', 'pageshow', 'load'], this.recomputeState);
+			this.recomputeState();
+		}
+	}
 
-    const fromTop = this.getDistanceFromTop();
-    const fromBottom = this.getDistanceFromBottom();
+	componentWillUnmount() {
+		this.off(['resize', 'scroll', 'touchstart', 'touchmove', 'touchend', 'pageshow', 'load'], this.recomputeState);
+		this.channel.unsubscribe(this.updateContext);
+	}
 
-    const topBreakpoint = this.state.containerOffset - this.props.topOffset;
-    const bottomBreakpoint = this.state.containerOffset + this.props.bottomOffset;
+	getXOffset() {
+		return this.refs.placeholder.getBoundingClientRect().left;
+	}
 
-    return fromTop <= topBreakpoint && fromBottom >= bottomBreakpoint;
-  }
+	getWidth() {
+		return this.refs.placeholder.getBoundingClientRect().width;
+	}
 
-  updateContext = ({ inherited, node }) => {
-    this.containerNode = node;
-    this.setState({
-      containerOffset: inherited,
-      distanceFromBottom: this.getDistanceFromBottom()
-    });
-  }
+	getHeight() {
+		return ReactDOM.findDOMNode(this.refs.children).getBoundingClientRect().height;
+	}
 
-  recomputeState = () => {
-    const isSticky = this.isSticky();
-    const height = this.getHeight();
-    const width = this.getWidth();
-    const xOffset = this.getXOffset();
-    const distanceFromBottom = this.getDistanceFromBottom();
-    const hasChanged = this.state.isSticky !== isSticky;
+	getDistanceFromTop() {
+		return this.refs.placeholder.getBoundingClientRect().top;
+	}
 
-    this.setState({ isSticky, height, width, xOffset, distanceFromBottom });
+	getDistanceFromBottom() {
+		if (!this.containerNode) return 0;
+		return this.containerNode.getBoundingClientRect().bottom;
+	}
 
-    if (hasChanged) {
-      if (this.channel) {
-        this.channel.update((data) => {
-          data.offset = (isSticky ? this.state.height : 0);
-        });
-      }
+	isSticky() {
+		if (!this.props.isActive) return false;
 
-      this.props.onStickyStateChange(isSticky);
-    }
-  }
+		const fromTop = this.getDistanceFromTop();
+		const fromBottom = this.getDistanceFromBottom();
 
-  on(events, callback) {
-    events.forEach((evt) => {
-      window.addEventListener(evt, callback);
-    });
-  }
+		const topBreakpoint = this.state.containerOffset - this.props.topOffset;
+		const bottomBreakpoint = this.state.containerOffset + this.props.bottomOffset;
 
-  off(events, callback) {
-    events.forEach((evt) => {
-      window.removeEventListener(evt, callback);
-    });
-  }
+		return fromTop <= topBreakpoint && fromBottom >= bottomBreakpoint;
+	}
 
-  shouldComponentUpdate(newProps, newState) {
-    // Have we changed the number of props?
-    const propNames = Object.keys(this.props);
-    if (Object.keys(newProps).length != propNames.length) return true;
+	updateContext = ({
+		inherited,
+		node
+	}) => {
+		this.containerNode = node;
+		this.setState({
+			containerOffset: inherited,
+			distanceFromBottom: this.getDistanceFromBottom()
+		});
+	}
 
-    // Have we changed any prop values?
-    const valuesMatch = propNames.every((key) => {
-      return newProps.hasOwnProperty(key) && newProps[key] === this.props[key];
-    });
-    if (!valuesMatch) return true;
+	recomputeState = () => {
+		const isSticky = this.isSticky();
+		const height = this.getHeight();
+		const width = this.getWidth();
+		const xOffset = this.getXOffset();
+		const distanceFromBottom = this.getDistanceFromBottom();
+		const hasChanged = this.state.isSticky !== isSticky;
 
-    // Have we changed any state that will always impact rendering?
-    const state = this.state;
-    if (newState.isSticky !== state.isSticky) return true;
+		this.setState({
+			isSticky,
+			height,
+			width,
+			xOffset,
+			distanceFromBottom
+		});
 
-    // If we are sticky, have we changed any state that will impact rendering?
-    if (state.isSticky) {
-      if (newState.height !== state.height) return true;
-      if (newState.width !== state.width) return true;
-      if (newState.xOffset !== state.xOffset) return true;
-      if (newState.containerOffset !== state.containerOffset) return true;
-      if (newState.distanceFromBottom !== state.distanceFromBottom) return true;
-    }
+		if (hasChanged) {
+			if (this.channel) {
+				this.channel.update((data) => {
+					data.offset = (isSticky ? this.state.height : 0); // eslint-disable-line
+				});
+			}
 
-    return false;
-  }
+			this.props.onStickyStateChange(isSticky);
+		}
+	}
 
-  /*
-   * The special sauce.
-   */
-  render() {
-    const placeholderStyle = { paddingBottom: 0 };
-    let className = this.props.className;
+	on(events, callback) {
+		const node = this.props.container && ReactDOM.findDOMNode(this.props.container);
+		events.forEach((evt) => {
+			window.addEventListener(evt, callback);
+			node && node.addEventListener(evt, callback); // eslint-disable-line
+		});
+	}
 
-    // To ensure that this component becomes sticky immediately on mobile devices instead
-    // of disappearing until the scroll event completes, we add `transform: translateZ(0)`
-    // to 'kick' rendering of this element to the GPU
-    // @see http://stackoverflow.com/questions/32875046
-    let style = Object.assign({}, { transform: 'translateZ(0)' }, this.props.style);
+	off(events, callback) {
+		const node = this.props.container && ReactDOM.findDOMNode(this.props.container);
+		events.forEach((evt) => {
+			window.removeEventListener(evt, callback);
+			node && node.removeEventListener(evt, callback); // eslint-disable-line
+		});
+	}
 
-    if (this.state.isSticky) {
-      const stickyStyle = {
-        position: 'fixed',
-        top: this.state.containerOffset,
-        left: this.state.xOffset,
-        width: this.state.width
-      };
+	/*
+	 * The special sauce.
+	 */
+	render() {
+		const placeholderStyle = {
+			paddingBottom: 0
+		};
+		let className = this.props.className;
 
-      const bottomLimit = this.state.distanceFromBottom - this.state.height - this.props.bottomOffset;
-      if (this.state.containerOffset > bottomLimit) {
-        stickyStyle.top = bottomLimit;
-      }
+		// To ensure that this component becomes sticky immediately on mobile devices instead
+		// of disappearing until the scroll event completes, we add `transform: translateZ(0)`
+		// to 'kick' rendering of this element to the GPU
+		// @see http://stackoverflow.com/questions/32875046
+		let style = Object.assign({}, {
+			transform: 'translateZ(0)'
+		}, this.props.style);
 
-      placeholderStyle.paddingBottom = this.state.height;
+		if (this.state.isSticky) {
+			const stickyStyle = {
+				position: 'fixed',
+				top: this.state.containerOffset,
+				left: this.state.xOffset,
+				width: this.state.width
+			};
 
-      className += ` ${this.props.stickyClassName}`;
-      style = Object.assign({}, style, stickyStyle, this.props.stickyStyle);
-    }
+			const bottomLimit = this.state.distanceFromBottom - this.state.height - this.props.bottomOffset;
+			if (this.state.containerOffset > bottomLimit) {
+				stickyStyle.top = bottomLimit;
+			}
 
-    const {
-      topOffset,
-      isActive,
-      stickyClassName,
-      stickyStyle,
-      bottomOffset,
-      onStickyStateChange,
-      ...props
-    } = this.props;
+			placeholderStyle.paddingBottom = this.state.height;
 
-    return (
-      <div>
-        <div ref="placeholder" style={placeholderStyle}></div>
-        <div {...props} ref="children" className={className} style={style}>
-          {this.props.children}
-        </div>
-      </div>
-    );
-  }
+			className += ` ${this.props.stickyClassName}`;
+			style = Object.assign({}, style, stickyStyle, this.props.stickyStyle);
+		}
+
+		const {
+			topOffset, // eslint-disable-line
+			isActive, // eslint-disable-line
+			stickyClassName, // eslint-disable-line
+			stickyStyle, // eslint-disable-line
+			bottomOffset, // eslint-disable-line
+			container, // eslint-disable-line
+			onStickyStateChange, // eslint-disable-line
+			...props
+		} = this.props;
+
+		return (
+			<div>
+				<div ref="placeholder" style={ placeholderStyle } id="stickyPlaceholder" />
+				<div {...props} ref="children" className={ className } style={ style }>
+					{ this.props.children }
+				</div>
+			</div>
+		);
+	}
 }

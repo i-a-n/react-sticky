@@ -1,4 +1,10 @@
-react-sticky [![Build Status](https://travis-ci.org/captivationsoftware/react-sticky.svg?branch=master)](https://travis-ci.org/captivationsoftware/react-sticky)
+react-sticky-alt [![Build Status](https://travis-ci.org/i-a-n/react-sticky-alt.svg?branch=master)](https://travis-ci.org/i-a-n/react-sticky-alt)
+
+## Fork Notice
+This is a fork of the original `react-sticky` repo, here: https://github.com/captivationsoftware/react-sticky
+
+The original impetus for the fork was to add a "container" property, so `<StickyHeader />` can listen for scroll events on a node, instead of `window`. The original README is as follows:
+
 ============
 The most powerful Sticky library available for React!
 

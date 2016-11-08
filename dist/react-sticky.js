@@ -87,32 +87,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+		value: true
 	});
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var Channel = function Channel(data) {
-	  _classCallCheck(this, Channel);
+		_classCallCheck(this, Channel);
 
-	  var listeners = [];
-	  data = data || {};
+		var listeners = [];
+		data = data || {}; // eslint-disable-line
 
-	  this.subscribe = function (fn) {
-	    listeners.push(fn);
-	  };
+		this.subscribe = function (fn) {
+			listeners.push(fn);
+		};
 
-	  this.unsubscribe = function (fn) {
-	    var idx = listeners.indexOf(fn);
-	    if (idx !== -1) listeners.splice(idx, 1);
-	  };
+		this.unsubscribe = function (fn) {
+			var idx = listeners.indexOf(fn);
+			if (idx !== -1) listeners.splice(idx, 1);
+		};
 
-	  this.update = function (fn) {
-	    if (fn) fn(data);
-	    listeners.forEach(function (l) {
-	      return l(data);
-	    });
-	  };
+		this.update = function (fn) {
+			if (fn) fn(data);
+			listeners.forEach(function (l) {
+				return l(data);
+			});
+		};
 	};
 
 	exports.default = Channel;
@@ -137,7 +137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+		value: true
 	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -163,74 +163,81 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var Container = function (_React$Component) {
-	  _inherits(Container, _React$Component);
+		_inherits(Container, _React$Component);
 
-	  function Container(props) {
-	    _classCallCheck(this, Container);
+		function Container(props) {
+			_classCallCheck(this, Container);
 
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Container).call(this, props));
+			var _this = _possibleConstructorReturn(this, (Container.__proto__ || Object.getPrototypeOf(Container)).call(this, props));
 
-	    _this.updateOffset = function (_ref) {
-	      var inherited = _ref.inherited;
-	      var offset = _ref.offset;
+			_this.updateOffset = function (_ref) {
+				var inherited = _ref.inherited,
+				    offset = _ref.offset;
 
-	      _this.channel.update(function (data) {
-	        data.inherited = inherited + offset;
-	      });
-	    };
+				_this.channel.update(function (data) {
+					data.inherited = inherited + offset; // eslint-disable-line
+				});
+			};
 
-	    _this.channel = new _channel2.default({ inherited: 0, offset: 0, node: null });
-	    return _this;
-	  }
+			_this.channel = new _channel2.default({
+				inherited: 0,
+				offset: 0,
+				node: null
+			});
+			return _this;
+		}
 
-	  _createClass(Container, [{
-	    key: 'getChildContext',
-	    value: function getChildContext() {
-	      return { 'sticky-channel': this.channel };
-	    }
-	  }, {
-	    key: 'componentWillMount',
-	    value: function componentWillMount() {
-	      var parentChannel = this.context['sticky-channel'];
-	      if (parentChannel) parentChannel.subscribe(this.updateOffset);
-	    }
-	  }, {
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      var node = _reactDom2.default.findDOMNode(this);
-	      this.channel.update(function (data) {
-	        data.node = node;
-	      });
-	    }
-	  }, {
-	    key: 'componentWillUnmount',
-	    value: function componentWillUnmount() {
-	      this.channel.update(function (data) {
-	        data.node = null;
-	      });
+		_createClass(Container, [{
+			key: 'getChildContext',
+			value: function getChildContext() {
+				return {
+					'sticky-channel': this.channel
+				};
+			}
+		}, {
+			key: 'componentWillMount',
+			value: function componentWillMount() {
+				var parentChannel = this.context['sticky-channel'];
+				if (parentChannel) parentChannel.subscribe(this.updateOffset);
+			}
+		}, {
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				var node = _reactDom2.default.findDOMNode(this);
+				this.channel.update(function (data) {
+					data.node = node; // eslint-disable-line
+				});
+			}
+		}, {
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+				this.channel.update(function (data) {
+					data.node = null; // eslint-disable-line
+				});
 
-	      var parentChannel = this.context['sticky-channel'];
-	      if (parentChannel) parentChannel.unsubscribe(this.updateOffset);
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        this.props,
-	        this.props.children
-	      );
-	    }
-	  }]);
+				var parentChannel = this.context['sticky-channel'];
+				if (parentChannel) parentChannel.unsubscribe(this.updateOffset);
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					'div',
+					this.props,
+					this.props.children // eslint-disable-line
 
-	  return Container;
+				);
+			}
+		}]);
+
+		return Container;
 	}(_react2.default.Component);
 
 	Container.contextTypes = {
-	  'sticky-channel': _react2.default.PropTypes.any
+		'sticky-channel': _react2.default.PropTypes.any
 	};
 	Container.childContextTypes = {
-	  'sticky-channel': _react2.default.PropTypes.any
+		'sticky-channel': _react2.default.PropTypes.any
 	};
 	exports.default = Container;
 	module.exports = exports['default'];
@@ -242,7 +249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+		value: true
 	});
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -268,239 +275,268 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var Sticky = function (_React$Component) {
-	  _inherits(Sticky, _React$Component);
+		_inherits(Sticky, _React$Component);
 
-	  function Sticky(props) {
-	    _classCallCheck(this, Sticky);
+		function Sticky(props) {
+			_classCallCheck(this, Sticky);
 
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Sticky).call(this, props));
+			var _this = _possibleConstructorReturn(this, (Sticky.__proto__ || Object.getPrototypeOf(Sticky)).call(this, props));
 
-	    _this.updateContext = function (_ref) {
-	      var inherited = _ref.inherited;
-	      var node = _ref.node;
+			_this.updateContext = function (_ref) {
+				var inherited = _ref.inherited,
+				    node = _ref.node;
 
-	      _this.containerNode = node;
-	      _this.setState({
-	        containerOffset: inherited,
-	        distanceFromBottom: _this.getDistanceFromBottom()
-	      });
-	    };
+				_this.containerNode = node;
+				_this.setState({
+					containerOffset: inherited,
+					distanceFromBottom: _this.getDistanceFromBottom()
+				});
+			};
 
-	    _this.recomputeState = function () {
-	      var isSticky = _this.isSticky();
-	      var height = _this.getHeight();
-	      var width = _this.getWidth();
-	      var xOffset = _this.getXOffset();
-	      var distanceFromBottom = _this.getDistanceFromBottom();
-	      var hasChanged = _this.state.isSticky !== isSticky;
+			_this.recomputeState = function () {
+				var isSticky = _this.isSticky();
+				var height = _this.getHeight();
+				var width = _this.getWidth();
+				var xOffset = _this.getXOffset();
+				var distanceFromBottom = _this.getDistanceFromBottom();
+				var hasChanged = _this.state.isSticky !== isSticky;
 
-	      _this.setState({ isSticky: isSticky, height: height, width: width, xOffset: xOffset, distanceFromBottom: distanceFromBottom });
+				_this.setState({
+					isSticky: isSticky,
+					height: height,
+					width: width,
+					xOffset: xOffset,
+					distanceFromBottom: distanceFromBottom
+				});
 
-	      if (hasChanged) {
-	        if (_this.channel) {
-	          _this.channel.update(function (data) {
-	            data.offset = isSticky ? _this.state.height : 0;
-	          });
-	        }
+				if (hasChanged) {
+					if (_this.channel) {
+						_this.channel.update(function (data) {
+							data.offset = isSticky ? _this.state.height : 0; // eslint-disable-line
+						});
+					}
 
-	        _this.props.onStickyStateChange(isSticky);
-	      }
-	    };
+					_this.props.onStickyStateChange(isSticky);
+				}
+			};
 
-	    _this.state = {};
-	    return _this;
-	  }
+			_this.state = {};
+			return _this;
+		}
 
-	  _createClass(Sticky, [{
-	    key: 'componentWillMount',
-	    value: function componentWillMount() {
-	      this.channel = this.context['sticky-channel'];
-	      this.channel.subscribe(this.updateContext);
-	    }
-	  }, {
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      this.on(['resize', 'scroll', 'touchstart', 'touchmove', 'touchend', 'pageshow', 'load'], this.recomputeState);
-	      this.recomputeState();
-	    }
-	  }, {
-	    key: 'componentWillReceiveProps',
-	    value: function componentWillReceiveProps() {
-	      this.recomputeState();
-	    }
-	  }, {
-	    key: 'componentWillUnmount',
-	    value: function componentWillUnmount() {
-	      this.off(['resize', 'scroll', 'touchstart', 'touchmove', 'touchend', 'pageshow', 'load'], this.recomputeState);
-	      this.channel.unsubscribe(this.updateContext);
-	    }
-	  }, {
-	    key: 'getXOffset',
-	    value: function getXOffset() {
-	      return this.refs.placeholder.getBoundingClientRect().left;
-	    }
-	  }, {
-	    key: 'getWidth',
-	    value: function getWidth() {
-	      return this.refs.placeholder.getBoundingClientRect().width;
-	    }
-	  }, {
-	    key: 'getHeight',
-	    value: function getHeight() {
-	      return _reactDom2.default.findDOMNode(this.refs.children).getBoundingClientRect().height;
-	    }
-	  }, {
-	    key: 'getDistanceFromTop',
-	    value: function getDistanceFromTop() {
-	      return this.refs.placeholder.getBoundingClientRect().top;
-	    }
-	  }, {
-	    key: 'getDistanceFromBottom',
-	    value: function getDistanceFromBottom() {
-	      if (!this.containerNode) return 0;
-	      return this.containerNode.getBoundingClientRect().bottom;
-	    }
-	  }, {
-	    key: 'isSticky',
-	    value: function isSticky() {
-	      if (!this.props.isActive) return false;
+		_createClass(Sticky, [{
+			key: 'componentWillMount',
+			value: function componentWillMount() {
+				this.channel = this.context['sticky-channel'];
+				this.channel.subscribe(this.updateContext);
+			}
+		}, {
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				this.on(['resize', 'scroll', 'touchstart', 'touchmove', 'touchend', 'pageshow', 'load'], this.recomputeState);
+				this.recomputeState();
+			}
+		}, {
+			key: 'componentWillReceiveProps',
+			value: function componentWillReceiveProps() {
+				this.recomputeState();
+			}
+		}, {
+			key: 'shouldComponentUpdate',
+			value: function shouldComponentUpdate(newProps, newState) {
+				var _this2 = this;
 
-	      var fromTop = this.getDistanceFromTop();
-	      var fromBottom = this.getDistanceFromBottom();
+				// Have we changed the number of props?
+				var propNames = Object.keys(this.props);
+				if (Object.keys(newProps).length !== propNames.length) return true;
 
-	      var topBreakpoint = this.state.containerOffset - this.props.topOffset;
-	      var bottomBreakpoint = this.state.containerOffset + this.props.bottomOffset;
+				// Have we changed any prop values?
+				var valuesMatch = propNames.every(function (key) {
+					// eslint-disable-line
+					return newProps.hasOwnProperty(key) && newProps[key] === _this2.props[key];
+				});
+				if (!valuesMatch) return true;
 
-	      return fromTop <= topBreakpoint && fromBottom >= bottomBreakpoint;
-	    }
-	  }, {
-	    key: 'on',
-	    value: function on(events, callback) {
-	      events.forEach(function (evt) {
-	        window.addEventListener(evt, callback);
-	      });
-	    }
-	  }, {
-	    key: 'off',
-	    value: function off(events, callback) {
-	      events.forEach(function (evt) {
-	        window.removeEventListener(evt, callback);
-	      });
-	    }
-	  }, {
-	    key: 'shouldComponentUpdate',
-	    value: function shouldComponentUpdate(newProps, newState) {
-	      var _this2 = this;
+				// Have we changed any state that will always impact rendering?
+				var state = this.state;
+				if (newState.isSticky !== state.isSticky) return true;
 
-	      // Have we changed the number of props?
-	      var propNames = Object.keys(this.props);
-	      if (Object.keys(newProps).length != propNames.length) return true;
+				// If we are sticky, have we changed any state that will impact rendering?
+				if (state.isSticky) {
+					if (newState.height !== state.height) return true;
+					if (newState.width !== state.width) return true;
+					if (newState.xOffset !== state.xOffset) return true;
+					if (newState.containerOffset !== state.containerOffset) return true;
+					if (newState.distanceFromBottom !== state.distanceFromBottom) return true;
+				}
 
-	      // Have we changed any prop values?
-	      var valuesMatch = propNames.every(function (key) {
-	        return newProps.hasOwnProperty(key) && newProps[key] === _this2.props[key];
-	      });
-	      if (!valuesMatch) return true;
+				return false;
+			}
+		}, {
+			key: 'componentDidUpdate',
+			value: function componentDidUpdate(prevProps) {
+				var scrollTargetElement = this.props.container;
 
-	      // Have we changed any state that will always impact rendering?
-	      var state = this.state;
-	      if (newState.isSticky !== state.isSticky) return true;
+				// Set the product line based on URL params
+				if (prevProps.container !== scrollTargetElement || scrollTargetElement === null) {
+					this.on(['resize', 'scroll', 'touchstart', 'touchmove', 'touchend', 'pageshow', 'load'], this.recomputeState);
+					this.recomputeState();
+				}
+			}
+		}, {
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+				this.off(['resize', 'scroll', 'touchstart', 'touchmove', 'touchend', 'pageshow', 'load'], this.recomputeState);
+				this.channel.unsubscribe(this.updateContext);
+			}
+		}, {
+			key: 'getXOffset',
+			value: function getXOffset() {
+				return this.refs.placeholder.getBoundingClientRect().left;
+			}
+		}, {
+			key: 'getWidth',
+			value: function getWidth() {
+				return this.refs.placeholder.getBoundingClientRect().width;
+			}
+		}, {
+			key: 'getHeight',
+			value: function getHeight() {
+				return _reactDom2.default.findDOMNode(this.refs.children).getBoundingClientRect().height;
+			}
+		}, {
+			key: 'getDistanceFromTop',
+			value: function getDistanceFromTop() {
+				return this.refs.placeholder.getBoundingClientRect().top;
+			}
+		}, {
+			key: 'getDistanceFromBottom',
+			value: function getDistanceFromBottom() {
+				if (!this.containerNode) return 0;
+				return this.containerNode.getBoundingClientRect().bottom;
+			}
+		}, {
+			key: 'isSticky',
+			value: function isSticky() {
+				if (!this.props.isActive) return false;
 
-	      // If we are sticky, have we changed any state that will impact rendering?
-	      if (state.isSticky) {
-	        if (newState.height !== state.height) return true;
-	        if (newState.width !== state.width) return true;
-	        if (newState.xOffset !== state.xOffset) return true;
-	        if (newState.containerOffset !== state.containerOffset) return true;
-	        if (newState.distanceFromBottom !== state.distanceFromBottom) return true;
-	      }
+				var fromTop = this.getDistanceFromTop();
+				var fromBottom = this.getDistanceFromBottom();
 
-	      return false;
-	    }
+				var topBreakpoint = this.state.containerOffset - this.props.topOffset;
+				var bottomBreakpoint = this.state.containerOffset + this.props.bottomOffset;
 
-	    /*
-	     * The special sauce.
-	     */
+				return fromTop <= topBreakpoint && fromBottom >= bottomBreakpoint;
+			}
+		}, {
+			key: 'on',
+			value: function on(events, callback) {
+				var node = this.props.container && _reactDom2.default.findDOMNode(this.props.container);
+				events.forEach(function (evt) {
+					window.addEventListener(evt, callback);
+					node && node.addEventListener(evt, callback); // eslint-disable-line
+				});
+			}
+		}, {
+			key: 'off',
+			value: function off(events, callback) {
+				var node = this.props.container && _reactDom2.default.findDOMNode(this.props.container);
+				events.forEach(function (evt) {
+					window.removeEventListener(evt, callback);
+					node && node.removeEventListener(evt, callback); // eslint-disable-line
+				});
+			}
 
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var placeholderStyle = { paddingBottom: 0 };
-	      var className = this.props.className;
+			/*
+	   * The special sauce.
+	   */
 
-	      // To ensure that this component becomes sticky immediately on mobile devices instead
-	      // of disappearing until the scroll event completes, we add `transform: translateZ(0)`
-	      // to 'kick' rendering of this element to the GPU
-	      // @see http://stackoverflow.com/questions/32875046
-	      var style = _extends({}, { transform: 'translateZ(0)' }, this.props.style);
+		}, {
+			key: 'render',
+			value: function render() {
+				var placeholderStyle = {
+					paddingBottom: 0
+				};
+				var className = this.props.className;
 
-	      if (this.state.isSticky) {
-	        var _stickyStyle = {
-	          position: 'fixed',
-	          top: this.state.containerOffset,
-	          left: this.state.xOffset,
-	          width: this.state.width
-	        };
+				// To ensure that this component becomes sticky immediately on mobile devices instead
+				// of disappearing until the scroll event completes, we add `transform: translateZ(0)`
+				// to 'kick' rendering of this element to the GPU
+				// @see http://stackoverflow.com/questions/32875046
+				var style = _extends({}, {
+					transform: 'translateZ(0)'
+				}, this.props.style);
 
-	        var bottomLimit = this.state.distanceFromBottom - this.state.height - this.props.bottomOffset;
-	        if (this.state.containerOffset > bottomLimit) {
-	          _stickyStyle.top = bottomLimit;
-	        }
+				if (this.state.isSticky) {
+					var _stickyStyle = {
+						position: 'fixed',
+						top: this.state.containerOffset,
+						left: this.state.xOffset,
+						width: this.state.width
+					};
 
-	        placeholderStyle.paddingBottom = this.state.height;
+					var bottomLimit = this.state.distanceFromBottom - this.state.height - this.props.bottomOffset;
+					if (this.state.containerOffset > bottomLimit) {
+						_stickyStyle.top = bottomLimit;
+					}
 
-	        className += ' ' + this.props.stickyClassName;
-	        style = _extends({}, style, _stickyStyle, this.props.stickyStyle);
-	      }
+					placeholderStyle.paddingBottom = this.state.height;
 
-	      var _props = this.props;
-	      var topOffset = _props.topOffset;
-	      var isActive = _props.isActive;
-	      var stickyClassName = _props.stickyClassName;
-	      var stickyStyle = _props.stickyStyle;
-	      var bottomOffset = _props.bottomOffset;
-	      var onStickyStateChange = _props.onStickyStateChange;
+					className += ' ' + this.props.stickyClassName;
+					style = _extends({}, style, _stickyStyle, this.props.stickyStyle);
+				}
 
-	      var props = _objectWithoutProperties(_props, ['topOffset', 'isActive', 'stickyClassName', 'stickyStyle', 'bottomOffset', 'onStickyStateChange']);
+				var _props = this.props,
+				    topOffset = _props.topOffset,
+				    isActive = _props.isActive,
+				    stickyClassName = _props.stickyClassName,
+				    stickyStyle = _props.stickyStyle,
+				    bottomOffset = _props.bottomOffset,
+				    container = _props.container,
+				    onStickyStateChange = _props.onStickyStateChange,
+				    props = _objectWithoutProperties(_props, ['topOffset', 'isActive', 'stickyClassName', 'stickyStyle', 'bottomOffset', 'container', 'onStickyStateChange']);
 
-	      return _react2.default.createElement(
-	        'div',
-	        null,
-	        _react2.default.createElement('div', { ref: 'placeholder', style: placeholderStyle }),
-	        _react2.default.createElement(
-	          'div',
-	          _extends({}, props, { ref: 'children', className: className, style: style }),
-	          this.props.children
-	        )
-	      );
-	    }
-	  }]);
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement('div', { ref: 'placeholder', style: placeholderStyle, id: 'stickyPlaceholder' }),
+					_react2.default.createElement(
+						'div',
+						_extends({}, props, { ref: 'children', className: className, style: style }),
+						this.props.children
+					)
+				);
+			}
+		}]);
 
-	  return Sticky;
+		return Sticky;
 	}(_react2.default.Component);
 
 	Sticky.propTypes = {
-	  isActive: _react2.default.PropTypes.bool,
-	  className: _react2.default.PropTypes.string,
-	  style: _react2.default.PropTypes.object,
-	  stickyClassName: _react2.default.PropTypes.string,
-	  stickyStyle: _react2.default.PropTypes.object,
-	  topOffset: _react2.default.PropTypes.number,
-	  bottomOffset: _react2.default.PropTypes.number,
-	  onStickyStateChange: _react2.default.PropTypes.func
+		isActive: _react2.default.PropTypes.bool,
+		className: _react2.default.PropTypes.string,
+		container: _react2.default.PropTypes.any,
+		children: _react2.default.PropTypes.any,
+		style: _react2.default.PropTypes.object,
+		stickyClassName: _react2.default.PropTypes.string,
+		stickyStyle: _react2.default.PropTypes.object,
+		topOffset: _react2.default.PropTypes.number,
+		bottomOffset: _react2.default.PropTypes.number,
+		onStickyStateChange: _react2.default.PropTypes.func
 	};
 	Sticky.defaultProps = {
-	  isActive: true,
-	  className: '',
-	  style: {},
-	  stickyClassName: 'sticky',
-	  stickyStyle: {},
-	  topOffset: 0,
-	  bottomOffset: 0,
-	  onStickyStateChange: function onStickyStateChange() {}
+		isActive: true,
+		className: '',
+		container: '',
+		style: {},
+		stickyClassName: 'sticky',
+		stickyStyle: {},
+		topOffset: 0,
+		bottomOffset: 0,
+		onStickyStateChange: function onStickyStateChange() {}
 	};
 	Sticky.contextTypes = {
-	  'sticky-channel': _react2.default.PropTypes.any
+		'sticky-channel': _react2.default.PropTypes.any
 	};
 	exports.default = Sticky;
 	module.exports = exports['default'];
