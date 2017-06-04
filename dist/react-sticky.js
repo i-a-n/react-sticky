@@ -239,7 +239,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	exports.default = Channel;
-	module.exports = exports['default'];
+	module.exports = exports["default"];
 
 /***/ }),
 /* 5 */
