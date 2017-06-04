@@ -5,7 +5,7 @@
     "main": "lib/index.js",
     "scripts": {
         "clean": "rimraf lib dist",
-        "transpile": "babel src --loose --out-dir lib",
+        "transpile": "./node_modules/.bin/babel src --loose --out-dir lib",
         "dist": "webpack lib/index.js dist/react-sticky.js --display-modules --progress && NODE_ENV=production webpack lib/index.js dist/react-sticky.min.js --display-modules --progress",
         "build": "npm run transpile && npm run dist",
         "postinstall": "npm run prepublish",
