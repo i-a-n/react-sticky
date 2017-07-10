@@ -43,9 +43,9 @@
         "jsdom": "8.0.4",
         "mocha": "^2.2.5",
         "prop-types": "^15.5.10",
-        "react": "15.5.4",
-        "react-addons-test-utils": "15.5.1",
-        "react-dom": "15.5.4",
+        "react": "^15.6.1",
+        "react-addons-test-utils": "^15.6.0",
+        "react-dom": "^15.6.1",
         "rimraf": "^2.5.2",
         "webpack": "^1.12.14"
     }
