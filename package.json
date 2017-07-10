@@ -1,6 +1,6 @@
 {
     "name": "react-sticky-alt",
-    "version": "5.0.5",
+    "version": "5.0.6",
     "description": "Sticky component for React",
     "main": "lib/index.js",
     "scripts": {
@@ -28,8 +28,8 @@
     "homepage": "https://github.com/i-a-n/react-sticky-alt",
     "peerDependencies": {
         "prop-types": "15.5.10",
-        "react": "15.5.4",
-        "react-dom": "15.5.4"
+        "react": "^15.6.1",
+        "react-dom": "^15.6.1"
     },
     "devDependencies": {
         "babel-cli": "6.24.0",
